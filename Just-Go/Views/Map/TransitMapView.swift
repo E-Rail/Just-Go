@@ -100,6 +100,12 @@ struct TransitMapView: UIViewRepresentable {
         longPress.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longPress)
         context.coordinator.longPressRecognizer = longPress
+        // A renderer's stroke and a symbol's image are resolved colours, frozen when they are made,
+        // so both are made again when the appearance changes.
+        let coordinator = context.coordinator
+        mapView.registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (mapView: MKMapView, _) in
+            coordinator.appearanceChanged(on: mapView)
+        }
         context.coordinator.sync(parent: self, on: mapView)
         return mapView
     }
@@ -129,24 +135,30 @@ struct TransitMapView: UIViewRepresentable {
         private var routeSignature = ""
         private var highlightSignature = ""
         private var appliedNetworkAlpha: CGFloat = 1
-        private var appliedAlwaysShowsStations: Bool?
         private var markerVisibilityBand = -1
-        /// Drives `strokeScale`. Seeded wide so a new map's first stroke suits the zoom it is
+        /// Drives `MapStroke.scale`. Seeded wide so a new map's first stroke suits the zoom it is
         /// actually at.
         private var currentMaxDelta: CLLocationDegrees = 0.05
-        private var annotationStations: [ObjectIdentifier: Station] = [:]
-        private var stationAnnotationsByID: [String: StationAnnotation] = [:]
+        /// A station's symbol and its label, by `StationAnnotation.key`: two annotations, so the
+        /// label can give way in a collision while the symbol stays.
+        private var stationAnnotationsByID: [String: [StationAnnotation]] = [:]
         private var overlayColors: [ObjectIdentifier: UIColor] = [:]
         private var overlayWidths: [ObjectIdentifier: CGFloat] = [:]
         private var overlayDashes: [ObjectIdentifier: [CGFloat]] = [:]
         private var networkOverlays: [MKOverlay] = []
+        /// Every network line again as one overlay, drawn under them all. One overlay, because a
+        /// casing per line would double what MapKit keeps for a city; under them all, so where two
+        /// lines cross neither is cut by the other's casing.
+        private var networkCasing: MKMultiPolyline?
         /// Held apart from the rest of the network because these come and go with zoom.
         private var interchangeOverlays: [MKOverlay] = []
         private var routeOverlays: [MKOverlay] = []
         private var highlightOverlays: [MKOverlay] = []
         /// The network's and the interchanges' overlays together, for the fade.
         private var networkOverlayIDs: Set<ObjectIdentifier> = []
-        private var stationSymbolImages: [String: UIImage] = [:]
+        /// Shared by every station with the same lines at the same zoom. A cache the system can
+        /// empty: a city's interchanges are a few hundred different rings across the zooms.
+        private let stationSymbolImages = NSCache<NSString, UIImage>()
         private var poiTask: Task<Void, Never>?
 
         init(parent: TransitMapView) {
@@ -178,7 +190,6 @@ struct TransitMapView: UIViewRepresentable {
             syncNetworks(on: mapView)
             syncNetworkAlpha(on: mapView)
             syncStations(on: mapView)
-            syncMarkerRule(on: mapView)
             syncHighlight(on: mapView)
             syncRoute(on: mapView)
         }
@@ -201,14 +212,29 @@ struct TransitMapView: UIViewRepresentable {
             mapView.removeOverlays(interchangeOverlays)
             clearOverlayMetadata(networkOverlays)
             clearOverlayMetadata(interchangeOverlays)
+            if let networkCasing {
+                mapView.removeOverlay(networkCasing)
+                clearOverlayMetadata([networkCasing])
+            }
             networkOverlays = []
             interchangeOverlays = []
+            networkCasing = nil
 
             addNetworks(parent.metroNetworks)
             addInterchanges(across: parent.metroNetworks)
-            networkOverlayIDs = Set((networkOverlays + interchangeOverlays).map { ObjectIdentifier($0) })
             if !networkOverlays.isEmpty {
-                mapView.addOverlays(networkOverlays, level: .aboveRoads)
+                let casing = MKMultiPolyline(networkOverlays.compactMap { $0 as? MKPolyline })
+                overlayWidths[ObjectIdentifier(casing)] = parent.networkLineWidth
+                networkCasing = casing
+            }
+            // Before anything is added: MapKit asks for a renderer during `addOverlays`, and
+            // `rendererFor` fades only what is in this set.
+            networkOverlayIDs = Set(
+                (networkOverlays + interchangeOverlays + [networkCasing].compactMap { $0 }).map { ObjectIdentifier($0) }
+            )
+            if let networkCasing {
+                // First, so it is under every line: overlays in one level draw in the order added.
+                mapView.addOverlays([networkCasing] + networkOverlays, level: .aboveRoads)
             }
             syncInterchangeVisibility(on: mapView)
         }
@@ -218,21 +244,11 @@ struct TransitMapView: UIViewRepresentable {
         private func syncNetworkAlpha(on mapView: MKMapView) {
             guard parent.networkAlpha != appliedNetworkAlpha else { return }
             appliedNetworkAlpha = parent.networkAlpha
-            for overlay in networkOverlays + interchangeOverlays {
+            for overlay in networkOverlays + interchangeOverlays + [networkCasing].compactMap({ $0 }) {
                 guard let renderer = mapView.renderer(for: overlay) else { continue }
                 renderer.alpha = appliedNetworkAlpha
                 renderer.setNeedsDisplay()
             }
-        }
-
-        /// Whether every station is drawn is otherwise re-applied only when the zoom crosses a
-        /// band, so a map that starts or stops showing a trip's stops at one zoom re-applies it.
-        private func syncMarkerRule(on mapView: MKMapView) {
-            guard parent.alwaysShowsStations != appliedAlwaysShowsStations else { return }
-            let isFirst = appliedAlwaysShowsStations == nil
-            appliedAlwaysShowsStations = parent.alwaysShowsStations
-            guard !isFirst else { return }
-            refreshMarkerVisibility(on: mapView)
         }
 
         private func syncHighlight(on mapView: MKMapView) {
@@ -276,17 +292,37 @@ struct TransitMapView: UIViewRepresentable {
             }
         }
 
+        /// A station has annotations exactly while it is drawn, so nothing hidden is left on the
+        /// map to take part in a collision. Runs again when the zoom crosses a band, which is what
+        /// moves a station in or out of view.
         private func syncStations(on mapView: MKMapView) {
-            // O(1)-ish change check via a hash of the desired station IDs, instead of building a
+            let maxDelta = max(mapView.region.span.latitudeDelta, mapView.region.span.longitudeDelta)
+            let drawn = parent.stations.filter { station in
+                StationAnnotationStyle.isVisible(
+                    at: maxDelta,
+                    isTransfer: station.isTransferStation,
+                    alwaysVisible: parent.alwaysShowsStations
+                )
+            }
+            // O(1)-ish change check via a hash of what is to be drawn, instead of building a
             // multi-KB joined string on every SwiftUI invalidation.
             var hasher = Hasher()
-            hasher.combine(parent.stations.count)
-            for station in parent.stations { hasher.combine(station.stationID) }
+            hasher.combine(drawn.count)
+            for station in drawn {
+                hasher.combine(station.stationID)
+                hasher.combine(station.isTransferStation)
+                for line in station.lines { hasher.combine(line.colorHex) }
+            }
             let nextSignature = String(hasher.finalize())
             guard nextSignature != stationSignature else { return }
             stationSignature = nextSignature
 
-            let desiredByID = Dictionary(parent.stations.map { ($0.stationID, $0) }, uniquingKeysWith: { first, _ in first })
+            // Keyed by what is drawn, not the station alone: a trip's map hands over the same
+            // station with only the lines the trip rides, and that is a different symbol.
+            let desiredByID = Dictionary(
+                drawn.map { (StationAnnotation.key(for: $0), $0) },
+                uniquingKeysWith: { first, _ in first }
+            )
             let desiredIDs = Set(desiredByID.keys)
             let currentIDs = Set(stationAnnotationsByID.keys)
 
@@ -294,18 +330,19 @@ struct TransitMapView: UIViewRepresentable {
             // the ones that remain, instead of clearing and re-adding everything.
             let removedIDs = currentIDs.subtracting(desiredIDs)
             if !removedIDs.isEmpty {
-                let removed = removedIDs.compactMap { stationAnnotationsByID.removeValue(forKey: $0) }
-                for annotation in removed { annotationStations.removeValue(forKey: ObjectIdentifier(annotation)) }
-                mapView.removeAnnotations(removed)
+                mapView.removeAnnotations(removedIDs.flatMap { stationAnnotationsByID.removeValue(forKey: $0) ?? [] })
             }
 
             let addedIDs = desiredIDs.subtracting(currentIDs)
             if !addedIDs.isEmpty {
-                let added = addedIDs.compactMap { desiredByID[$0] }.map { station -> StationAnnotation in
-                    let annotation = StationAnnotation(station: station)
-                    annotationStations[ObjectIdentifier(annotation)] = station
-                    stationAnnotationsByID[station.stationID] = annotation
-                    return annotation
+                let added = addedIDs.flatMap { id -> [StationAnnotation] in
+                    guard let station = desiredByID[id] else { return [] }
+                    let pair = [
+                        StationAnnotation(station: station, part: .symbol),
+                        StationAnnotation(station: station, part: .label)
+                    ]
+                    stationAnnotationsByID[id] = pair
+                    return pair
                 }
                 mapView.addAnnotations(added)
             }
@@ -514,19 +551,25 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            guard let stationAnnotation = annotation as? StationAnnotation else { return nil }
+            guard let annotation = annotation as? StationAnnotation else { return nil }
 
-            let identifier = "station"
-            let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? StationAnnotationView ??
-                StationAnnotationView(annotation: stationAnnotation, reuseIdentifier: identifier)
-            view.annotation = stationAnnotation
-            configureStationSymbol(view, station: stationAnnotation.station, region: mapView.region)
+            let view: MKAnnotationView
+            switch annotation.part {
+            case .symbol:
+                view = mapView.dequeueReusableAnnotationView(withIdentifier: "station.symbol") as? StationSymbolView ??
+                    StationSymbolView(annotation: annotation, reuseIdentifier: "station.symbol")
+            case .label:
+                view = mapView.dequeueReusableAnnotationView(withIdentifier: "station.label") as? StationLabelView ??
+                    StationLabelView(annotation: annotation, reuseIdentifier: "station.label")
+            }
+            view.annotation = annotation
+            configure(view, for: annotation, on: mapView)
             return view
         }
 
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard let annotation = view.annotation else { return }
-            if let station = annotationStations[ObjectIdentifier(annotation)] {
+            if let station = (annotation as? StationAnnotation)?.station {
                 // A station tap supersedes any in-flight POI resolve; stop it.
                 cancelPOIResolution()
                 parent.onStationSelected(station)
@@ -572,10 +615,11 @@ struct TransitMapView: UIViewRepresentable {
             if band != markerVisibilityBand {
                 markerVisibilityBand = band
                 currentMaxDelta = maxDelta
-                refreshMarkerVisibility(on: mapView)
+                syncStations(on: mapView)
+                refreshStationViews(on: mapView)
                 syncInterchangeVisibility(on: mapView)
                 // Safe on the marker band: its breakpoints (0.055, 0.1, 0.18, 0.8) include
-                // `strokeScale`'s (0.055, 0.18, 0.8). Keep that true if either set moves.
+                // `MapStroke.scale`'s (0.055, 0.18, 0.8). Keep that true if either set moves.
                 refreshOverlayWidths(on: mapView)
             }
             if let onShownRegionChanged = parent.onShownRegionChanged {
@@ -589,28 +633,28 @@ struct TransitMapView: UIViewRepresentable {
             parent.onRegionChanged?(visibleRegion)
         }
 
-        /// How much to shrink every stroke at the current zoom. `MKPolylineRenderer.lineWidth` is
-        /// in screen points, so at the whole trip's zoom an unshrunk leg is a band across the city.
-        private func strokeScale(for maxDelta: CLLocationDegrees) -> CGFloat {
-            switch maxDelta {
-            case ..<0.055: return 1
-            case ..<0.18: return 0.85
-            case ..<0.8: return 0.62
-            default: return 0.45
-            }
+        /// The network's own stroke at the current zoom, which the stations on it are sized from.
+        private var networkStroke: CGFloat {
+            MapStroke.width(parent.networkLineWidth, at: currentMaxDelta)
         }
 
-        private func applyStrokeWidth(to renderer: MKPolylineRenderer, polyline: MKPolyline) {
-            let key = ObjectIdentifier(polyline)
+        private func applyStroke(to renderer: MKOverlayPathRenderer, overlay: MKOverlay) {
+            let key = ObjectIdentifier(overlay)
             let width = overlayWidths[key] ?? 5
-            // Floored so a hairline never disappears entirely at the widest zooms.
-            renderer.lineWidth = max(1.5, width * strokeScale(for: currentMaxDelta))
+            let stroke = MapStroke.width(width, at: currentMaxDelta)
+            renderer.lineJoin = .round
+            guard overlay !== networkCasing else {
+                renderer.lineWidth = MapStroke.casingWidth(over: stroke)
+                renderer.lineCap = .round
+                return
+            }
+            renderer.lineWidth = stroke
             // Against the width actually drawn, floor included, so the dash keeps the proportions
             // `SegmentType.dash(width:)` set. Butt caps under a dash, because a round one overhangs
             // half a width past each end and closes the gaps into a string of blobs; round on a
             // solid leg, where it caps the dark casing over the line's own end.
             let dash = overlayDashes[key]
-            renderer.lineDashPattern = dash?.map { NSNumber(value: Double($0 * renderer.lineWidth / width)) }
+            renderer.lineDashPattern = dash?.map { NSNumber(value: Double($0 * stroke / width)) }
             renderer.lineCap = dash == nil ? .round : .butt
         }
 
@@ -618,18 +662,15 @@ struct TransitMapView: UIViewRepresentable {
         /// sets two numbers each and redraws.
         private func refreshOverlayWidths(on mapView: MKMapView) {
             for overlay in mapView.overlays {
-                guard let polyline = overlay as? MKPolyline,
-                      let renderer = mapView.renderer(for: overlay) as? MKPolylineRenderer else {
-                    continue
-                }
-                applyStrokeWidth(to: renderer, polyline: polyline)
+                guard let renderer = mapView.renderer(for: overlay) as? MKOverlayPathRenderer else { continue }
+                applyStroke(to: renderer, overlay: overlay)
                 renderer.setNeedsDisplay()
             }
         }
 
         private func markerBand(for maxDelta: CLLocationDegrees) -> Int {
-            // Breakpoints: `StationAnnotationStyle`'s size buckets (0.055, 0.18) and visibility
-            // thresholds (ordinary ≤ 0.1, transfer ≤ 0.8).
+            // Breakpoints: `MapStroke.scale`'s (0.055, 0.18, 0.8), which size a station's symbol
+            // and its label, and the visibility thresholds (ordinary ≤ 0.1, transfer ≤ 0.8).
             if maxDelta <= 0.055 { return 0 }
             if maxDelta <= 0.1 { return 1 }
             if maxDelta <= 0.18 { return 2 }
@@ -637,87 +678,78 @@ struct TransitMapView: UIViewRepresentable {
             return 4
         }
 
-        private func refreshMarkerVisibility(on mapView: MKMapView) {
+        /// The casing and every symbol's rim are the page's background in the appearance they were
+        /// made for, so both are made again.
+        func appearanceChanged(on mapView: MKMapView) {
+            if let networkCasing, let renderer = mapView.renderer(for: networkCasing) as? MKOverlayPathRenderer {
+                renderer.strokeColor = MapStroke.casingColor(in: mapView)
+                renderer.setNeedsDisplay()
+            }
+            refreshStationViews(on: mapView)
+        }
+
+        private func refreshStationViews(on mapView: MKMapView) {
             for annotation in mapView.annotations {
-                guard let stationAnnotation = annotation as? StationAnnotation,
+                guard let annotation = annotation as? StationAnnotation,
                       let view = mapView.view(for: annotation) else {
                     continue
                 }
-                configureStationSymbol(view, station: stationAnnotation.station, region: mapView.region)
+                configure(view, for: annotation, on: mapView)
             }
         }
 
-        private func configureStationSymbol(
-            _ view: MKAnnotationView,
-            station: Station,
-            region: MKCoordinateRegion
-        ) {
-            guard let view = view as? StationAnnotationView else { return }
+        private func configure(_ view: MKAnnotationView, for annotation: StationAnnotation, on mapView: MKMapView) {
+            let station = annotation.station
+            let symbol = StationSymbol(lineWidth: networkStroke, isTransfer: station.isTransferStation)
             view.canShowCallout = false
-            view.displayPriority = station.isTransferStation ? .required : .defaultLow
-            view.collisionMode = .rectangle
-            let style = StationAnnotationStyle(
-                region: region,
-                isTransfer: station.isTransferStation,
-                alwaysVisible: parent.alwaysShowsStations
-            )
-            guard style.isVisible else {
-                view.isHidden = true
-                return
+            if let view = view as? StationSymbolView {
+                // Always drawn: a station is where the rider can board, whatever is beside it.
+                view.displayPriority = .required
+                view.collisionMode = .circle
+                let isDark = mapView.traitCollection.userInterfaceStyle == .dark
+                let key = "\(annotation.ringColorHexes.joined(separator: ","))|\(symbol.id)|\(isDark)"
+                view.configure(station: station, symbol: symbol, key: key) {
+                    self.stationSymbolImage(symbol, colorHexes: annotation.ringColorHexes, key: key, on: mapView)
+                }
+            } else if let view = view as? StationLabelView {
+                // A name gives way to another station's symbol and to a busier station's name, so
+                // names never pile up: MapKit hides the lower priority of two views that collide.
+                view.displayPriority = station.isTransferStation ? .defaultHigh : .defaultLow
+                view.collisionMode = .rectangle
+                view.configure(station: station, symbol: symbol, textSize: StationAnnotationStyle.labelSize(at: currentMaxDelta))
             }
-
-            view.configure(
-                station: station,
-                style: style,
-                symbol: stationSymbolImage(isTransfer: station.isTransferStation, pointSize: style.symbolSize)
-            )
-            view.isHidden = false
         }
 
-        private func stationSymbolImage(isTransfer: Bool, pointSize: CGFloat) -> UIImage {
-            let key = "\(isTransfer)-\(pointSize)"
-            if let cached = stationSymbolImages[key] {
+        private func stationSymbolImage(
+            _ symbol: StationSymbol,
+            colorHexes: [String],
+            key: String,
+            on mapView: MKMapView
+        ) -> UIImage {
+            if let cached = stationSymbolImages.object(forKey: key as NSString) {
                 return cached
             }
-
-            let size = CGSize(width: pointSize, height: pointSize)
-            let image = UIGraphicsImageRenderer(size: size).image { context in
-                let rect = CGRect(origin: .zero, size: size).insetBy(dx: 1, dy: 1)
-                context.cgContext.setFillColor(UIColor.white.cgColor)
-                context.cgContext.fillEllipse(in: rect)
-                context.cgContext.setStrokeColor(UIColor.black.cgColor)
-                context.cgContext.setLineWidth(max(1.5, pointSize * 0.13))
-                context.cgContext.strokeEllipse(in: rect)
-
-                guard isTransfer,
-                      let transfer = UIImage(
-                        systemName: "arrow.triangle.2.circlepath",
-                        withConfiguration: UIImage.SymbolConfiguration(
-                            pointSize: pointSize * 0.52,
-                            weight: .bold
-                        )
-                      )?.withTintColor(.black, renderingMode: .alwaysOriginal) else {
-                    return
-                }
-                transfer.draw(at: CGPoint(
-                    x: (pointSize - transfer.size.width) / 2,
-                    y: (pointSize - transfer.size.height) / 2
-                ))
-            }
-            stationSymbolImages[key] = image
+            let image = symbol.image(
+                ringColors: colorHexes.map { UIColor(Color(hex: $0)) },
+                rimColor: MapStroke.casingColor(in: mapView)
+            )
+            stationSymbolImages.setObject(image, forKey: key as NSString)
             return image
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            guard let polyline = overlay as? MKPolyline else {
+            let renderer: MKOverlayPathRenderer
+            if let casing = overlay as? MKMultiPolyline {
+                renderer = MKMultiPolylineRenderer(multiPolyline: casing)
+                renderer.strokeColor = MapStroke.casingColor(in: mapView)
+            } else if let polyline = overlay as? MKPolyline {
+                renderer = MKPolylineRenderer(polyline: polyline)
+                renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
+            } else {
                 return MKOverlayRenderer(overlay: overlay)
             }
-
-            let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = overlayColors[ObjectIdentifier(polyline)] ?? .systemBlue
-            applyStrokeWidth(to: renderer, polyline: polyline)
-            renderer.lineJoin = .round
-            if networkOverlayIDs.contains(ObjectIdentifier(polyline)) {
+            applyStroke(to: renderer, overlay: overlay)
+            if networkOverlayIDs.contains(ObjectIdentifier(overlay)) {
                 renderer.alpha = parent.networkAlpha
             }
             return renderer
@@ -725,10 +757,100 @@ struct TransitMapView: UIViewRepresentable {
     }
 }
 
+/// The map's strokes, and the station symbols that sit on them, in multiples of one line's width,
+/// so a line, its casing and its stations keep their proportions at every zoom.
+private enum MapStroke {
+    /// How much to shrink every stroke at this zoom. A renderer's `lineWidth` is in screen points,
+    /// so at the whole trip's zoom an unshrunk leg is a band across the city.
+    static func scale(for maxDelta: CLLocationDegrees) -> CGFloat {
+        switch maxDelta {
+        case ..<0.055: return 1
+        case ..<0.18: return 0.85
+        case ..<0.8: return 0.62
+        default: return 0.45
+        }
+    }
+
+    /// Floored so a hairline never disappears entirely at the widest zooms.
+    static func width(_ width: CGFloat, at maxDelta: CLLocationDegrees) -> CGFloat {
+        max(1.5, width * scale(for: maxDelta))
+    }
+
+    /// A casing shows a quarter of its line's width on each side.
+    static func casingWidth(over lineWidth: CGFloat) -> CGFloat {
+        lineWidth * 1.5
+    }
+
+    /// What a network line is cased in and a station symbol rimmed with: the background of the
+    /// appearance the map is in, so a line is cut out of the basemap rather than outlined on it.
+    /// Resolved, because a renderer and an image both keep the colour they were given.
+    static func casingColor(in mapView: MKMapView) -> UIColor {
+        UIColor.systemBackground.resolvedColor(with: mapView.traitCollection)
+    }
+}
+
+/// A station on the map: a white disc ringed in the colours of its lines, a larger one where
+/// lines meet. Sized from the stroke of the line it sits on.
+private struct StationSymbol {
+    /// The network's stroke at the zoom the symbol is drawn for.
+    let lineWidth: CGFloat
+    let isTransfer: Bool
+
+    /// Across the ring: twice the line for a stop, three times for an interchange.
+    var ringDiameter: CGFloat { lineWidth * (isTransfer ? 3 : 2) }
+    var ringWidth: CGFloat { ringDiameter / 6 }
+    /// The same quarter of the line's width its casing shows.
+    var rimWidth: CGFloat { lineWidth / 4 }
+    /// Whole points, so the image is not resampled onto the view's pixels.
+    var side: CGFloat { (ringDiameter + rimWidth * 2).rounded(.up) }
+    var id: String { "\(isTransfer)-\(lineWidth)" }
+
+    /// - Parameter ringColors: One per line, in the station's own order, clockwise from the top.
+    ///   Empty draws a neutral ring, for a station whose lines are not known here.
+    func image(ringColors: [UIColor], rimColor: UIColor) -> UIImage {
+        let center = CGPoint(x: side / 2, y: side / 2)
+        return UIGraphicsImageRenderer(size: CGSize(width: side, height: side)).image { renderer in
+            let context = renderer.cgContext
+            func fillDisc(_ diameter: CGFloat, _ color: UIColor) {
+                context.setFillColor(color.cgColor)
+                context.fillEllipse(in: CGRect(
+                    x: center.x - diameter / 2, y: center.y - diameter / 2, width: diameter, height: diameter
+                ))
+            }
+            fillDisc(ringDiameter + rimWidth * 2, rimColor)
+            // The first colour all the way round and the others as wedges over it, so the seam
+            // between two wedges never shows the rim through.
+            fillDisc(ringDiameter, ringColors.first ?? .darkGray)
+            let sweep = 2 * CGFloat.pi / CGFloat(max(ringColors.count, 1))
+            for (index, color) in ringColors.enumerated().dropFirst() {
+                let start = -CGFloat.pi / 2 + sweep * CGFloat(index)
+                context.move(to: center)
+                context.addArc(
+                    center: center, radius: ringDiameter / 2,
+                    startAngle: start, endAngle: start + sweep, clockwise: false
+                )
+                context.closePath()
+                context.setFillColor(color.cgColor)
+                context.fillPath()
+            }
+            // White in both appearances: on a dark map a station is still the bright dot.
+            fillDisc(ringDiameter - ringWidth * 2, .white)
+        }
+    }
+}
+
 private final class StationAnnotation: NSObject, MKAnnotation {
+    enum Part {
+        case symbol
+        case label
+    }
+
     let station: Station
+    let part: Part
+    /// The station's line colours, each once: two lines that share a colour are one arc of the ring.
+    let ringColorHexes: [String]
     // Resolved once (zh-Hant involves a Hans→Hant transform); MapKit reads title and subtitle
-    // repeatedly.
+    // repeatedly. On the symbol only: it is the part VoiceOver reads.
     let title: String?
     let subtitle: String?
 
@@ -736,20 +858,67 @@ private final class StationAnnotation: NSObject, MKAnnotation {
         station.coordinate
     }
 
-    init(station: Station) {
+    /// The station and how it is drawn, so one station drawn two ways is two annotations.
+    static func key(for station: Station) -> String {
+        "\(station.stationID)|\(station.isTransferStation)|\(ringColorHexes(of: station).joined(separator: ","))"
+    }
+
+    private static func ringColorHexes(of station: Station) -> [String] {
+        var seen = Set<String>()
+        return station.lines.map { $0.colorHex.uppercased() }.filter { seen.insert($0).inserted }
+    }
+
+    init(station: Station, part: Part) {
         self.station = station
-        self.title = station.localizedName
-        self.subtitle = station.uniqueLogicalLines.map(\.localizedName).joined(separator: " / ")
+        self.part = part
+        self.ringColorHexes = Self.ringColorHexes(of: station)
+        self.title = part == .symbol ? station.localizedName : nil
+        self.subtitle = part == .symbol
+            ? station.uniqueLogicalLines.map(\.localizedName).joined(separator: " / ")
+            : nil
         super.init()
     }
 }
 
-private final class StationAnnotationView: MKAnnotationView {
-    private let symbolView = UIImageView()
+/// What two station views keep clear of each other. MapKit tests a collision on a view's alignment
+/// rectangle, and both station views state theirs: one left at zero is given a margin of MapKit's
+/// own (4 points, measured on iOS 27.2), wide enough to hide every name beside its own symbol.
+private final class StationSymbolView: MKAnnotationView {
+    private var configurationKey = ""
+    private var rimWidth: CGFloat = 0
+
+    /// The ring, without the rim around it.
+    override var alignmentRectInsets: UIEdgeInsets {
+        UIEdgeInsets(top: rimWidth, left: rimWidth, bottom: rimWidth, right: rimWidth)
+    }
+
+    /// - Parameter image: Made only when `key` differs from what the view already shows.
+    func configure(station: Station, symbol: StationSymbol, key: String, image: () -> UIImage) {
+        accessibilityLabel = station.accessibilityLabel
+        guard key != configurationKey else { return }
+        configurationKey = key
+        rimWidth = symbol.rimWidth
+        // An annotation view takes its image's size and centres it on the coordinate.
+        self.image = image()
+    }
+}
+
+/// A station's name, beside its symbol. An annotation of its own so that MapKit can hide it in a
+/// collision and leave the symbol.
+private final class StationLabelView: MKAnnotationView {
     private let tagView = UIView()
     private let chineseLabel = UILabel()
     private let englishLabel = UILabel()
     private var configurationKey = ""
+
+    /// Wider than the tag by a hairline on every side, so two names are never drawn touching.
+    /// `symbolGap` is more than this, which is what keeps a name clear of its own symbol.
+    override var alignmentRectInsets: UIEdgeInsets {
+        UIEdgeInsets(top: -Metrics.hairline, left: -Metrics.hairline, bottom: -Metrics.hairline, right: -Metrics.hairline)
+    }
+
+    /// From the symbol's edge to the tag's.
+    private static let symbolGap = Metrics.s / 2
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
@@ -759,13 +928,15 @@ private final class StationAnnotationView: MKAnnotationView {
         applyBorderColor()
         // `UIView.backgroundColor` re-resolves with the appearance; a `.cgColor` is resolved once
         // and frozen, so it is refreshed here when the in-app Light/Dark setting changes.
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: StationAnnotationView, _) in
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: StationLabelView, _) in
             view.applyBorderColor()
         }
-        addSubview(symbolView)
         addSubview(tagView)
         tagView.addSubview(chineseLabel)
         tagView.addSubview(englishLabel)
+        // The symbol is the station's one accessibility element; this would read it twice.
+        isAccessibilityElement = false
+        accessibilityElementsHidden = true
     }
 
     private func applyBorderColor() {
@@ -776,23 +947,18 @@ private final class StationAnnotationView: MKAnnotationView {
         nil
     }
 
-    func configure(station: Station, style: StationAnnotationStyle, symbol: UIImage) {
-        let nextKey = "\(station.stationID):\(style.id)"
+    func configure(station: Station, symbol: StationSymbol, textSize: CGFloat) {
+        let nextKey = "\(station.stationID):\(symbol.id):\(textSize)"
         guard nextKey != configurationKey else { return }
         configurationKey = nextKey
 
-        let symbolSize = style.symbolSize
-        let labelSize = style.labelSize
-        symbolView.image = symbol
-        symbolView.frame = CGRect(x: 0, y: 0, width: symbolSize, height: symbolSize)
-
         chineseLabel.text = station.localizedName
-        chineseLabel.font = .systemFont(ofSize: labelSize, weight: .semibold)
+        chineseLabel.font = .systemFont(ofSize: textSize, weight: .semibold)
         chineseLabel.textColor = .label
         chineseLabel.sizeToFit()
 
         englishLabel.text = station.alternateLocalizedName
-        englishLabel.font = .systemFont(ofSize: max(7, labelSize - 3), weight: .regular)
+        englishLabel.font = .systemFont(ofSize: max(7, textSize - 3), weight: .regular)
         englishLabel.textColor = .secondaryLabel
         englishLabel.isHidden = englishLabel.text?.isEmpty != false
         englishLabel.sizeToFit()
@@ -802,41 +968,30 @@ private final class StationAnnotationView: MKAnnotationView {
         let labelWidth = max(chineseLabel.bounds.width, englishLabel.isHidden ? 0 : englishLabel.bounds.width)
         let labelHeight = chineseLabel.bounds.height + (englishLabel.isHidden ? 0 : englishLabel.bounds.height + 1)
         let tagSize = CGSize(width: labelWidth + horizontalPadding * 2, height: labelHeight + verticalPadding * 2)
-        let viewHeight = max(symbolSize, tagSize.height)
-        let tagOrigin = CGPoint(x: symbolSize + 4, y: (viewHeight - tagSize.height) / 2)
 
-        bounds = CGRect(x: 0, y: 0, width: symbolSize + 4 + tagSize.width, height: viewHeight)
-        symbolView.center = CGPoint(x: symbolSize / 2, y: viewHeight / 2)
-        tagView.frame = CGRect(origin: tagOrigin, size: tagSize)
+        bounds = CGRect(origin: .zero, size: tagSize)
+        tagView.frame = bounds
         tagView.layer.cornerRadius = min(8, tagSize.height / 2)
         chineseLabel.frame.origin = CGPoint(x: horizontalPadding, y: verticalPadding)
         englishLabel.frame.origin = CGPoint(
             x: horizontalPadding,
             y: chineseLabel.frame.maxY + (englishLabel.isHidden ? 0 : 1)
         )
-        centerOffset = CGPoint(x: bounds.width / 2 - symbolSize / 2, y: 0)
-        accessibilityLabel = station.accessibilityLabel
+        centerOffset = CGPoint(x: symbol.side / 2 + Self.symbolGap + tagSize.width / 2, y: 0)
     }
 }
 
-private struct StationAnnotationStyle {
+private enum StationAnnotationStyle {
     /// Above this span an ordinary station is a dot in a smear, so it is not drawn. Interchange
     /// links share it.
     static let ordinaryStationMaxDelta: CLLocationDegrees = 0.1
 
-    let isVisible: Bool
-    let symbolSize: CGFloat
-    let labelSize: CGFloat
-    let id: String
+    static func isVisible(at maxDelta: CLLocationDegrees, isTransfer: Bool, alwaysVisible: Bool) -> Bool {
+        alwaysVisible || maxDelta <= (isTransfer ? 0.8 : ordinaryStationMaxDelta)
+    }
 
-    init(region: MKCoordinateRegion, isTransfer: Bool, alwaysVisible: Bool = false) {
-        let maxDelta = max(region.span.latitudeDelta, region.span.longitudeDelta)
-        isVisible = alwaysVisible || maxDelta <= (isTransfer ? 0.8 : Self.ordinaryStationMaxDelta)
-        let bucket = maxDelta <= 0.055 ? 0 : (maxDelta <= 0.18 ? 1 : 2)
-        let baseSize: CGFloat = bucket == 0 ? 18 : (bucket == 1 ? 9 : 6)
-        symbolSize = baseSize + (isTransfer ? 3 : 0)
-        labelSize = bucket == 0 ? 12 : (bucket == 1 ? 10 : 9)
-        id = "\(isTransfer)-\(bucket)"
+    static func labelSize(at maxDelta: CLLocationDegrees) -> CGFloat {
+        maxDelta <= 0.055 ? 12 : (maxDelta <= 0.18 ? 10 : 9)
     }
 }
 

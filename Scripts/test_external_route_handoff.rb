@@ -92,6 +92,26 @@ class ExternalRouteHandoffTest < Minitest::Test
                  "no coordinate conversion belongs on this path")
   end
 
+  def test_a_scanner_tap_is_not_asked_about_twice
+    # Invisible at build time and on every simulator. `canOpenURL` answers false for any scheme the
+    # plist does not declare, and a scanner's link need not be on the scheme its chip is offered
+    # on: Alipay is found by `alipay://` and its scanner is `alipays://`. A second `canOpenURL` on
+    # the link itself therefore always failed, and the chip was shown with a tap that did nothing.
+    body = HANDOFF[/static func open\(_ scanner: BikeScanner\) \{(.*?)\n    \}/m, 1]
+    refute_nil body, "open(_ scanner:) has moved; this test no longer reads it"
+    refute_match(/canOpenURL/, body, "a scanner's tap is gated on a scheme that may not be declared")
+    assert_match(/UIApplication\.shared\.open\(url\)/, body)
+  end
+
+  def test_a_scanner_is_found_by_a_declared_scheme
+    # The other half: what decides whether the chip is shown must be answerable.
+    scanners = HANDOFF[/enum BikeScanner.*?var queryScheme: String \{(.*?)\n        \}/m, 1]
+    refute_nil scanners
+    scanners.scan(/return "(\w+)"/).flatten.each do |scheme|
+      assert_includes declared_schemes, scheme
+    end
+  end
+
   def test_hailing_is_only_offered_for_a_car
     assert_match(/case \.didi: return mode == \.driving/, HANDOFF)
   end

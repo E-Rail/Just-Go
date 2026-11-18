@@ -67,7 +67,7 @@ enum ExternalRouteHandoff {
     /// nor which operator serves the street. It never tells anyone to photograph anything either;
     /// station photography is restricted in parts of mainland China.
     ///
-    /// **These two schemes are not documented by Tencent or Ant for third-party use** and may stop
+    /// **These two links are not documented by Tencent or Ant for third-party use** and may stop
     /// working. Offered only when `canOpenURL` says the app is installed, with no web fallback (a
     /// browser cannot open a camera). If one breaks, delete it.
     enum BikeScanner: String, CaseIterable, Identifiable {
@@ -85,8 +85,8 @@ enum ExternalRouteHandoff {
             }
         }
 
-        /// Must also appear in `LSApplicationQueriesSchemes` or `canOpenURL` answers false however
-        /// installed the app is.
+        /// What says the app is installed. Must also appear in `LSApplicationQueriesSchemes` or
+        /// `canOpenURL` answers false however installed the app is.
         var queryScheme: String {
             switch self {
             case .alipay: return "alipay"
@@ -94,26 +94,44 @@ enum ExternalRouteHandoff {
             }
         }
 
+        /// The scanner itself. Alipay's is on `alipays`, a scheme of its own that the plist does not
+        /// declare: opening needs no declaration, asking `canOpenURL` about it does. WeChat's is
+        /// `scanqrcode`, the link in common use; `weixin://dl/scan` does not reach the scanner on
+        /// a rider's phone. Neither can be checked off a device: no simulator has the apps.
         var url: URL? {
             switch self {
             case .alipay: return URL(string: "alipays://platformapi/startapp?saId=10000007")
-            case .weChat: return URL(string: "weixin://dl/scan")
+            case .weChat: return URL(string: "weixin://scanqrcode")
             }
         }
     }
 
+    #if DEBUG
+    /// Every app counted as installed, to look at a leg with all its chips: no simulator has one of
+    /// these apps, so a leg there shows Apple Maps alone. Opening one still fails as it would.
+    private static var debugCountsEveryAppInstalled: Bool {
+        ProcessInfo.processInfo.environment["JUST_GO_DEBUG_HANDOFF_APPS"] != nil
+    }
+    #endif
+
     /// The scanners actually installed, in the order a rider is most likely to want them.
     @MainActor
     static func bikeScanners() -> [BikeScanner] {
-        BikeScanner.allCases.filter { scanner in
+        #if DEBUG
+        if debugCountsEveryAppInstalled { return BikeScanner.allCases }
+        #endif
+        return BikeScanner.allCases.filter { scanner in
             guard let probe = URL(string: "\(scanner.queryScheme)://") else { return false }
             return UIApplication.shared.canOpenURL(probe)
         }
     }
 
+    /// Opened without asking first. The chip is only there because `bikeScanners()` found the app,
+    /// and a second question here is asked of the link's own scheme, which need not be the one
+    /// declared: the answer is then always no, and the tap does nothing.
     @MainActor
     static func open(_ scanner: BikeScanner) {
-        guard let url = scanner.url, UIApplication.shared.canOpenURL(url) else { return }
+        guard let url = scanner.url else { return }
         UIApplication.shared.open(url)
     }
 
@@ -123,6 +141,9 @@ enum ExternalRouteHandoff {
     static func destinations(for mode: AccessLegMode) -> [Destination] {
         Destination.allCases.filter { destination in
             guard destination.handles(mode) else { return false }
+            #if DEBUG
+            if debugCountsEveryAppInstalled { return true }
+            #endif
             guard let scheme = destination.queryScheme else { return true }
             guard let probe = URL(string: "\(scheme)://") else { return false }
             return UIApplication.shared.canOpenURL(probe)

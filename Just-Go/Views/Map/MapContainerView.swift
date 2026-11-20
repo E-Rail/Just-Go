@@ -639,6 +639,7 @@ struct MapContainerView: View {
             // is about.
             alwaysShowsStations: !browsing,
             metroNetworks: viewModel?.metroNetworks ?? [],
+            interchangeSymbols: viewModel?.interchangeSymbols ?? [:],
             route: focus.route,
             showsUserLocation: viewModel?.isLocationAuthorized == true || focus.isGuidance,
             topChromeHeight: topChromeHeight,

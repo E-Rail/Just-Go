@@ -78,6 +78,10 @@ final class MapViewModel {
     /// camera stay on `visibleRegion`. Nil until the map has reported, when `visibleRegion` stands in.
     @ObservationIgnored var shownRegion: MapVisibleRegion?
     var metroNetworks: [MetroNetwork] = []
+    /// Where the map draws the loaded networks' interchanges, by qualified station ID
+    /// (`MetroNetworkProviding.interchangeSymbolCoordinates(in:)`). Published with `metroNetworks`,
+    /// so no interchange is drawn before it is placed.
+    var interchangeSymbols: [String: CLLocationCoordinate2D] = [:]
     var isLocationAuthorized: Bool {
         locationService.isAuthorized
     }
@@ -86,6 +90,7 @@ final class MapViewModel {
     private let stationSearchService: StationSearchService
     private let metroNetworkProvider: MetroNetworkProviding
     private var stationsByCity: [String: [Station]] = [:]
+    private var interchangeSymbolsByCity: [String: [String: CLLocationCoordinate2D]] = [:]
     /// Cities whose loaded network a data update replaced. Drawn as they are until the replacement
     /// has loaded, so the lines do not blink out, and never kept by the next load.
     @ObservationIgnored private var replacedCityIDs: Set<String> = []
@@ -140,6 +145,7 @@ final class MapViewModel {
 
         guard region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
+            if !interchangeSymbols.isEmpty { interchangeSymbols = [:] }
             return
         }
 
@@ -246,31 +252,39 @@ final class MapViewModel {
         let replaced = replacedCityIDs
         let retained = metroNetworks.filter { requested.contains($0.cityID) && !replaced.contains($0.cityID) }
         var loadedByCity = Dictionary(retained.map { ($0.cityID, $0) }, uniquingKeysWith: { first, _ in first })
+        var symbolsByCity = interchangeSymbolsByCity.filter { loadedByCity[$0.key] != nil }
 
-        await withTaskGroup(of: MetroNetwork?.self) { group in
+        await withTaskGroup(of: (MetroNetwork, [String: CLLocationCoordinate2D])?.self) { group in
             for cityID in requested where loadedByCity[cityID] == nil {
                 group.addTask { [metroNetworkProvider] in
-                    await metroNetworkProvider.network(for: cityID)
+                    guard let network = await metroNetworkProvider.network(for: cityID) else { return nil }
+                    return (network, await metroNetworkProvider.interchangeSymbolCoordinates(in: cityID))
                 }
             }
-            for await network in group {
-                guard let network, !Task.isCancelled else { continue }
+            for await loaded in group {
+                guard let (network, symbols) = loaded, !Task.isCancelled else { continue }
                 loadedByCity[network.cityID] = network
+                symbolsByCity[network.cityID] = symbols
             }
         }
 
         guard !Task.isCancelled, generation == networkLoadGeneration else { return }
         guard let region = visibleRegion, region.maxDelta <= 2 else {
             if !metroNetworks.isEmpty { metroNetworks = [] }
+            if !interchangeSymbols.isEmpty { interchangeSymbols = [:] }
             if !stations.isEmpty { stations = [] }
             return
         }
 
-        // Stage 1: lines.
+        // Stage 1: lines, and where their interchanges are drawn.
         let shown = shownRegion ?? region
+        interchangeSymbolsByCity = symbolsByCity
         metroNetworks = loadedByCity.values
             .filter { $0.bounds.intersects(shown) }
             .sorted { $0.cityID < $1.cityID }
+        interchangeSymbols = metroNetworks.reduce(into: [:]) { symbols, network in
+            symbols.merge(symbolsByCity[network.cityID] ?? [:]) { first, _ in first }
+        }
 
         // Stage 2: station markers.
         var loadedStationsByCity: [String: [Station]] = [:]

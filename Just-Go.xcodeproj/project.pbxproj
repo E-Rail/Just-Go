@@ -62,6 +62,7 @@
 		A1000983 /* Map/RiderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000983 /* Map/RiderPanel.swift */; };
 		A1000985 /* Map/MapPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000985 /* Map/MapPanel.swift */; };
 		A1000986 /* Map/MapFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000986 /* Map/MapFocus.swift */; };
+		A1000990 /* Map/InterchangePlacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000990 /* Map/InterchangePlacement.swift */; };
 		A1000984 /* Components/SavedPlaceChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000984 /* Components/SavedPlaceChips.swift */; };
 		A1000042 /* Extensions/UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000047 /* Extensions/UserDefaults+Codable.swift */; };
 		A100004A /* Data/OfficialCityPackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200004A /* Data/OfficialCityPackService.swift */; };
@@ -218,6 +219,7 @@
 		A2000983 /* Map/RiderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/RiderPanel.swift; sourceTree = "<group>"; };
 		A2000985 /* Map/MapPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapPanel.swift; sourceTree = "<group>"; };
 		A2000986 /* Map/MapFocus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/MapFocus.swift; sourceTree = "<group>"; };
+		A2000990 /* Map/InterchangePlacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map/InterchangePlacement.swift; sourceTree = "<group>"; };
 		A2000984 /* Components/SavedPlaceChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/SavedPlaceChips.swift; sourceTree = "<group>"; };
 		A2000047 /* Extensions/UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		A2000048 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
@@ -465,6 +467,7 @@
 				A2000983 /* Map/RiderPanel.swift */,
 				A2000985 /* Map/MapPanel.swift */,
 				A2000986 /* Map/MapFocus.swift */,
+				A2000990 /* Map/InterchangePlacement.swift */,
 				A2000984 /* Components/SavedPlaceChips.swift */,
 				A2000313 /* Map/MapItemDetailSheet.swift */,
 				A2000008 /* Station/StationDetailView.swift */,
@@ -666,6 +669,7 @@
 				A1000983 /* Map/RiderPanel.swift in Sources */,
 				A1000985 /* Map/MapPanel.swift in Sources */,
 				A1000986 /* Map/MapFocus.swift in Sources */,
+				A1000990 /* Map/InterchangePlacement.swift in Sources */,
 				A1000984 /* Components/SavedPlaceChips.swift in Sources */,
 				A1000008 /* Station/StationDetailView.swift in Sources */,
 				A1000062 /* Station/StationDetailView+Accessibility.swift in Sources */,

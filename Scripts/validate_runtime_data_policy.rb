@@ -122,8 +122,9 @@ expected_web_literals = Set.new([
   # it returns may be persisted or committed — the check below enforces that no response payload
   # ever lands in the repo.
   ["Just-Go/Services/Map/BaiduMapsClient.swift", "https://api.map.baidu.com"],
-  ["Just-Go/Views/Profile/SettingsView.swift", "https://e-rail.github.io/just-go/docs/privacy/"],
-  ["Just-Go/Views/Profile/SettingsView.swift", "https://e-rail.github.io/just-go/docs/terms/"],
+  # The website's policy pages, opened in Safari. Plain http until a certificate covers the domain.
+  ["Just-Go/Views/Profile/SettingsView.swift", "http://just-go.com.cn/privacy/"],
+  ["Just-Go/Views/Profile/SettingsView.swift", "http://just-go.com.cn/terms/"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.hk/en/terms-and-conditions"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://data.gov.tw/license"],
   ["Just-Go/Views/Profile/TransitDataView.swift", "https://www.openstreetmap.org/copyright"],
@@ -149,7 +150,7 @@ expected_web_literals = Set.new([
 actual_web_literals = Set.new
 swift_sources.each do |absolute_path, source|
   relative_path = absolute_path.delete_prefix("#{ROOT}/")
-  source.scan(/"(https:\/\/[^"\s]+)"/).flatten.each do |url|
+  source.scan(/"(https?:\/\/[^"\s]+)"/).flatten.each do |url|
     actual_web_literals << [relative_path, url]
   end
 end

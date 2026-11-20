@@ -1,9 +1,13 @@
 import SwiftUI
 import UIKit
 
+/// The policy pages on the app's own website. Plain http: over HTTPS the site's host presents its
+/// own certificate, not one for just-go.com.cn, so an https link opens on a certificate warning.
+/// Safari loads these, not the app, so App Transport Security does not apply. Move them to https
+/// once a certificate covers the domain.
 enum AppWebLinks {
-    static let privacyPolicy = URL(string: "https://e-rail.github.io/just-go/docs/privacy/")!
-    static let termsOfService = URL(string: "https://e-rail.github.io/just-go/docs/terms/")!
+    static let privacyPolicy = URL(string: "http://just-go.com.cn/privacy/")!
+    static let termsOfService = URL(string: "http://just-go.com.cn/terms/")!
 }
 
 /// The pages Settings pushes. A value per page, so a DEBUG launch can open one.

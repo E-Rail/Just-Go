@@ -36,6 +36,9 @@ struct TransitMapView: UIViewRepresentable {
     /// whole-trip spans are usually wider than that.
     var alwaysShowsStations = false
     let metroNetworks: [MetroNetwork]
+    /// Where `metroNetworks`' interchanges are drawn, by qualified station ID, for those not drawn on
+    /// their own point (`MetroNetwork.interchangeSymbolCoordinates()`). Comes with the networks.
+    var interchangeSymbols: [String: CLLocationCoordinate2D] = [:]
     let route: Route?
     let showsUserLocation: Bool
     /// How much of the map's top edge the app's floating chrome covers, measured so Dynamic Type
@@ -159,6 +162,8 @@ struct TransitMapView: UIViewRepresentable {
         /// Shared by every station with the same lines at the same zoom. A cache the system can
         /// empty: a city's interchanges are a few hundred different rings across the zooms.
         private let stationSymbolImages = NSCache<NSString, UIImage>()
+        /// Where each interchange's symbol goes on the networks now loaded. Made again with them.
+        private var placements = InterchangeSymbolPlacements(networks: [], symbols: [:])
         private var poiTask: Task<Void, Never>?
 
         init(parent: TransitMapView) {
@@ -219,6 +224,7 @@ struct TransitMapView: UIViewRepresentable {
             networkOverlays = []
             interchangeOverlays = []
             networkCasing = nil
+            placements = InterchangeSymbolPlacements(networks: parent.metroNetworks, symbols: parent.interchangeSymbols)
 
             addNetworks(parent.metroNetworks)
             addInterchanges(across: parent.metroNetworks)
@@ -307,6 +313,9 @@ struct TransitMapView: UIViewRepresentable {
             // O(1)-ish change check via a hash of what is to be drawn, instead of building a
             // multi-KB joined string on every SwiftUI invalidation.
             var hasher = Hasher()
+            // An interchange's symbol is placed against the loaded lines, so it can move when they
+            // change.
+            hasher.combine(networkSignature)
             hasher.combine(drawn.count)
             for station in drawn {
                 hasher.combine(station.stationID)
@@ -318,9 +327,13 @@ struct TransitMapView: UIViewRepresentable {
             stationSignature = nextSignature
 
             // Keyed by what is drawn, not the station alone: a trip's map hands over the same
-            // station with only the lines the trip rides, and that is a different symbol.
+            // station with only the lines the trip rides, and that is a different symbol, possibly
+            // in a different place.
             let desiredByID = Dictionary(
-                drawn.map { (StationAnnotation.key(for: $0), $0) },
+                drawn.map { station in
+                    let coordinate = placements.coordinate(for: station)
+                    return (StationAnnotation.key(for: station, at: coordinate), (station, coordinate))
+                },
                 uniquingKeysWith: { first, _ in first }
             )
             let desiredIDs = Set(desiredByID.keys)
@@ -336,10 +349,10 @@ struct TransitMapView: UIViewRepresentable {
             let addedIDs = desiredIDs.subtracting(currentIDs)
             if !addedIDs.isEmpty {
                 let added = addedIDs.flatMap { id -> [StationAnnotation] in
-                    guard let station = desiredByID[id] else { return [] }
+                    guard let (station, coordinate) = desiredByID[id] else { return [] }
                     let pair = [
-                        StationAnnotation(station: station, part: .symbol),
-                        StationAnnotation(station: station, part: .label)
+                        StationAnnotation(station: station, coordinate: coordinate, part: .symbol),
+                        StationAnnotation(station: station, coordinate: coordinate, part: .label)
                     ]
                     stationAnnotationsByID[id] = pair
                     return pair
@@ -349,7 +362,8 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         private func syncRoute(on mapView: MKMapView) {
-            let nextSignature = parent.route?.id.uuidString ?? "no-route"
+            // With the networks, because a ride's connectors end at its stations' placed symbols.
+            let nextSignature = "\(parent.route?.id.uuidString ?? "no-route")|\(networkSignature)"
             guard nextSignature != routeSignature else { return }
             routeSignature = nextSignature
             mapView.removeOverlays(routeOverlays)
@@ -405,18 +419,26 @@ struct TransitMapView: UIViewRepresentable {
         /// loaded network, because a link's halves can be in different packs (Shenzhen's 罗湖 and
         /// Hong Kong's 羅湖).
         private func addInterchanges(across networks: [MetroNetwork]) {
-            var coordinatesByID: [String: CLLocationCoordinate2D] = [:]
+            var stationsByID: [String: (station: MetroStation, cityID: String)] = [:]
             for network in networks {
-                for station in network.stations where coordinatesByID[station.id] == nil {
-                    coordinatesByID[station.id] = station.coordinate
+                for station in network.stations where stationsByID[station.id] == nil {
+                    stationsByID[station.id] = (station, network.cityID)
                 }
+            }
+            // Ends where each station's symbol is drawn.
+            func coordinate(of stationID: String) -> CLLocationCoordinate2D? {
+                guard let (station, cityID) = stationsByID[stationID] else { return nil }
+                return placements.coordinate(
+                    stationID: MetroStationIdentifier.qualified(cityID: cityID, stationID: station.id),
+                    at: station.coordinate
+                )
             }
             // A cross-pack link is written into both of its packs, so it arrives twice.
             var drawn = Set<String>()
             for link in networks.flatMap(\.interchanges) {
                 guard drawn.insert("\(link.fromStationID)|\(link.toStationID)").inserted,
-                      let from = coordinatesByID[link.fromStationID],
-                      let to = coordinatesByID[link.toStationID] else { continue }
+                      let from = coordinate(of: link.fromStationID),
+                      let to = coordinate(of: link.toStationID) else { continue }
                 addPolyline(
                     [from, to],
                     colorHex: SegmentType.transfer.colorHex(line: nil),
@@ -429,6 +451,11 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         private func addRoute(_ route: Route) {
+            // Where this map draws each stop, by the same rule as its symbol.
+            let stopCoordinates = Dictionary(
+                route.mapStations.map { ($0.stationID, placements.coordinate(for: $0)) },
+                uniquingKeysWith: { first, _ in first }
+            )
             for segment in route.segments {
                 let coordinates = segment.drawableCoordinates.map {
                     CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
@@ -460,7 +487,7 @@ struct TransitMapView: UIViewRepresentable {
                     simplify: true,
                     collection: &routeOverlays
                 )
-                addStationConnectors(for: segment, drawn: coordinates)
+                addStationConnectors(for: segment, drawn: coordinates, stopCoordinates: stopCoordinates)
             }
         }
 
@@ -469,14 +496,26 @@ struct TransitMapView: UIViewRepresentable {
         /// 272 m from 15号线's track). The ride draws only the track; bending it out to the platform
         /// would spike, and leaving the gap looks broken. Colour means "the train runs here", and
         /// this is not track.
-        private func addStationConnectors(for segment: RouteSegment, drawn: [CLLocationCoordinate2D]) {
+        ///
+        /// Each connector ends at the station's symbol, which for an interchange is where its lines
+        /// meet rather than the station's own point (`InterchangePlacement`).
+        private func addStationConnectors(
+            for segment: RouteSegment,
+            drawn: [CLLocationCoordinate2D],
+            stopCoordinates: [String: CLLocationCoordinate2D]
+        ) {
             guard segment.type.isTransit,
-                  let first = segment.stationStops.first?.coordinate,
-                  let last = segment.stationStops.last?.coordinate,
+                  let first = segment.stationStops.first,
+                  let last = segment.stationStops.last,
                   let trackStart = drawn.first,
                   let trackEnd = drawn.last else { return }
-            let boarding = CLLocationCoordinate2D(latitude: first.latitude, longitude: first.longitude)
-            let alighting = CLLocationCoordinate2D(latitude: last.latitude, longitude: last.longitude)
+            func drawnCoordinate(of stop: RouteStationStop) -> CLLocationCoordinate2D? {
+                stopCoordinates[stop.stationID] ?? stop.coordinate.map {
+                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                }
+            }
+            guard let boarding = drawnCoordinate(of: first),
+                  let alighting = drawnCoordinate(of: last) else { return }
             for (station, track) in [(boarding, trackStart), (alighting, trackEnd)] {
                 // Below this they are the same place at any zoom, and an overlay per station per
                 // leg is not free.
@@ -839,6 +878,75 @@ private struct StationSymbol {
     }
 }
 
+/// Where each interchange's symbol is drawn on the loaded networks: where its lines meet
+/// (`InterchangePlacement`). The networks' own placements arrive with them, worked out off the main
+/// thread; only a trip drawing two lines of a larger interchange is placed here, when first drawn,
+/// and remembered until the networks change.
+///
+/// Lines are looked up across every loaded network, not only the station's own: routing gives a
+/// corridor two packs share one pack's line ID.
+private final class InterchangeSymbolPlacements {
+    private let symbols: [String: CLLocationCoordinate2D]
+    private var stationsByID: [String: MetroStation] = [:]
+    private var linesByID: [String: MetroLine] = [:]
+    private var tracksByLineID: [String: [[CLLocationCoordinate2D]]] = [:]
+    private var placed: [String: CLLocationCoordinate2D] = [:]
+
+    /// - Parameter symbols: The networks' placements, by qualified station ID.
+    init(networks: [MetroNetwork], symbols: [String: CLLocationCoordinate2D]) {
+        self.symbols = symbols
+        for network in networks {
+            for station in network.stations {
+                stationsByID[MetroStationIdentifier.qualified(cityID: network.cityID, stationID: station.id)] = station
+            }
+            for line in network.lines where linesByID[line.id] == nil {
+                linesByID[line.id] = line
+            }
+        }
+    }
+
+    /// Where `station`'s symbol goes. Drawn with all its lines (browsing), or with the one line of a
+    /// trip passing through, it is where its network placed it; drawn with two of its lines (a trip
+    /// changing between them), it is where those two meet.
+    func coordinate(for station: Station) -> CLLocationCoordinate2D {
+        guard station.isTransferStation else { return station.coordinate }
+        let ownLineIDs = Set(stationsByID[station.stationID]?.lineIDs ?? []).filter { linesByID[$0] != nil }
+        let drawnLineIDs = Set(station.lines.map(\.lineID)).filter { linesByID[$0] != nil }
+        if drawnLineIDs.count > 1, drawnLineIDs != ownLineIDs {
+            return coordinate(stationID: station.stationID, at: station.coordinate, lineIDs: drawnLineIDs)
+        }
+        return coordinate(stationID: station.stationID, at: station.coordinate)
+    }
+
+    /// A station drawn with all its lines.
+    ///
+    /// - Parameter stationID: The qualified ID (`MetroStationIdentifier.qualified`).
+    func coordinate(stationID: String, at coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        symbols[stationID] ?? coordinate
+    }
+
+    private func coordinate(
+        stationID: String,
+        at coordinate: CLLocationCoordinate2D,
+        lineIDs: Set<String>
+    ) -> CLLocationCoordinate2D {
+        let ordered = lineIDs.sorted()
+        let key = ([stationID] + ordered).joined(separator: "|")
+        if let known = placed[key] { return known }
+        let result = InterchangePlacement.place(station: coordinate, lineTracks: ordered.compactMap(tracks(of:))).coordinate
+        placed[key] = result
+        return result
+    }
+
+    private func tracks(of lineID: String) -> [[CLLocationCoordinate2D]]? {
+        if let known = tracksByLineID[lineID] { return known }
+        guard let line = linesByID[lineID] else { return nil }
+        let tracks = line.paths.map { $0.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) } }
+        tracksByLineID[lineID] = tracks
+        return tracks
+    }
+}
+
 private final class StationAnnotation: NSObject, MKAnnotation {
     enum Part {
         case symbol
@@ -853,14 +961,14 @@ private final class StationAnnotation: NSObject, MKAnnotation {
     // repeatedly. On the symbol only: it is the part VoiceOver reads.
     let title: String?
     let subtitle: String?
-
-    var coordinate: CLLocationCoordinate2D {
-        station.coordinate
-    }
+    /// Where the symbol is drawn: the station's own point, or for an interchange where its lines
+    /// meet (`InterchangeSymbolPlacements`). The label sits beside it.
+    let coordinate: CLLocationCoordinate2D
 
     /// The station and how it is drawn, so one station drawn two ways is two annotations.
-    static func key(for station: Station) -> String {
-        "\(station.stationID)|\(station.isTransferStation)|\(ringColorHexes(of: station).joined(separator: ","))"
+    static func key(for station: Station, at coordinate: CLLocationCoordinate2D) -> String {
+        "\(station.stationID)|\(station.isTransferStation)|\(ringColorHexes(of: station).joined(separator: ","))" +
+            "|\(coordinate.latitude),\(coordinate.longitude)"
     }
 
     private static func ringColorHexes(of station: Station) -> [String] {
@@ -868,8 +976,9 @@ private final class StationAnnotation: NSObject, MKAnnotation {
         return station.lines.map { $0.colorHex.uppercased() }.filter { seen.insert($0).inserted }
     }
 
-    init(station: Station, part: Part) {
+    init(station: Station, coordinate: CLLocationCoordinate2D, part: Part) {
         self.station = station
+        self.coordinate = coordinate
         self.part = part
         self.ringColorHexes = Self.ringColorHexes(of: station)
         self.title = part == .symbol ? station.localizedName : nil

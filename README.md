@@ -1,133 +1,120 @@
-# Just-Go
+<p align="center">
+  <img src="http://just-go.com.cn/assets/icon.png" width="128" height="128" alt="Just-Go app icon">
+</p>
 
-[![Website](https://img.shields.io/badge/website-e--rail.github.io%2Fjust--go-2ea44f?logo=githubpages&logoColor=white)](https://e-rail.github.io/just-go)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS-lightgrey?logo=apple)](https://e-rail.github.io/just-go)
-[![iOS](https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white)](https://www.apple.com/ios/)
-[![License: GPL-3.0](https://img.shields.io/badge/software-GPL3.0-green.svg)](LICENSE)
+<h1 align="center">Just-Go</h1>
 
-English | [中文](README-zh.md)
+<p align="center">
+  <strong>Metro trips planned on your phone, underground, with no guesswork.</strong><br>
+  A transit companion for iPhone and iPad, covering the rail networks of 53 cities.
+</p>
 
-Just-Go is an iPhone and iPad transit companion for route planning, station context, and honest
-data confidence. Rail routing runs on a bundled network graph, so it works underground and with no
-signal. Apple Maps supplies place search and walking legs, and narrowly scoped official city data
-is layered on top. Missing schedules, layouts, transfer paths and door positions are shown as
-unavailable rather than inferred.
+<p align="center">
+  <a href="https://testflight.apple.com/join/jYbwrfAa"><img src="https://img.shields.io/badge/TestFlight-join%20the%20beta-0D96F6?logo=apple&logoColor=white" alt="Join the TestFlight beta"></a>
+  <a href="http://just-go.com.cn"><img src="https://img.shields.io/badge/website-just--go.com.cn-2ea44f" alt="Website: just-go.com.cn"></a>
+  <img src="https://img.shields.io/badge/iOS-18.0%2B-black?logo=apple&logoColor=white" alt="iOS 18.0 or later">
+  <img src="https://img.shields.io/badge/iPhone%20%C2%B7%20iPad-supported-lightgrey?logo=apple" alt="iPhone and iPad">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/software-GPL--3.0-green" alt="Software licence: GPL-3.0"></a>
+</p>
 
-## What Ships
+<p align="center">English | <a href="README-zh.md">中文</a></p>
 
-- Offline rail routing across a 58-city catalog. 53 of those cities carry a canonical
-  metro-network baseline, separately attributed to OpenStreetMap under ODbL 1.0, covering 6,718
-  stations. The remaining 5 are catalog-only.
-- Apple Maps place search, walking directions, and map rendering.
-- Guidance that follows the trip. Steps advance by location and by time, each position says
-  whether it was located or estimated, every ride has a "get ready" alert, and the step under
-  way is shown on the Lock Screen and in the Dynamic Island, where a tap returns to guidance.
-- Station accessibility data for 582 stations across 14 cities, from each city's own open data.
-- Hong Kong MTR and Light Rail station, route, accessibility, and live-reference data from
-  DATA.GOV.HK under its custom reuse terms.
-- Official Hong Kong live arrivals from the government transport API, with timeout, cache,
-  request-coalescing, and rate-limit handling.
-- The latest departure for a trip: the last moment it can start and still ride every train in it,
-  with the ride that sets the limit and a reminder. Shown only where the operator publishes a
-  first and a last train for every ride in the trip.
-- Native three-category station information for 416 reviewed Beijing Subway stations
-  (First / Last, Exits, Facilities) and all 162 Hong Kong stations
-  (Live Trains, Exits, Facilities).
-- A bundled official-resource directory for all 58 catalog cities, with 770 reviewed links to
-  rider-facing maps, travel information, accessibility resources, and help pages.
-- Optional online enrichment where a Baidu Maps key is configured: ticket fare, measured transfer
-  corridor lengths, first and last train times, a taxi estimate beside a last-train warning, and
-  cycling and e-bike routing for the first and last mile. None of it is bundled, cached to disk or
-  committed, and the app plans routes without it.
+| Map | Routes | Route details | Guidance | Station |
+| :-: | :-: | :-: | :-: | :-: |
+| <img src="http://just-go.com.cn/assets/screenshots/map.png" width="160" alt="The metro map"> | <img src="http://just-go.com.cn/assets/screenshots/results.png" width="160" alt="Route results"> | <img src="http://just-go.com.cn/assets/screenshots/detail.png" width="160" alt="A route's details"> | <img src="http://just-go.com.cn/assets/screenshots/guiding.png" width="160" alt="Step-by-step guidance"> | <img src="http://just-go.com.cn/assets/screenshots/station.png" width="160" alt="A station's page"> |
 
-Bundled station accessibility coverage, by city:
+## Why Just-Go
 
-| City | Network stations | With accessibility data |
-| --- | ---: | ---: |
-| Xi'an | 247 | 164 |
-| Taipei | 151 | 118 |
-| Hong Kong | 162 | 98 |
-| Shanghai | 471 | 56 |
-| Beijing | 444 | 43 |
-| Guangzhou | 414 | 37 |
-| Shenzhen | 372 | 19 |
-| Nanjing | 210 | 11 |
-| Hangzhou | 270 | 10 |
-| Chengdu | 396 | 9 |
-| Wuhan | 293 | 7 |
-| Tianjin | 239 | 5 |
-| Chongqing | 273 | 3 |
-| Suzhou | 235 | 2 |
+| | |
+| --- | --- |
+| 🚇 **Works with no signal**<br>Rail routes are planned on the phone, from a metro network that ships inside the app. | 🧭 **Guidance that follows you**<br>Steps move on by location and by time, and each says whether it was located or estimated. The step under way stays on the Lock Screen and in the Dynamic Island. |
+| 🚉 **Know the station before you arrive**<br>First and last trains straight from the operator in Beijing, Shanghai, Guangzhou and Hangzhou, with exits and facilities in Beijing and Shanghai. In Hong Kong: live trains, exits and facilities. 1,686 stations in all. | ♿ **Step-free when you need it**<br>Ask for wheelchair access, an elevator, or no stairs, and every plan follows it. Accessibility data covers 603 stations in 14 cities. |
+| 🌙 **Never miss the last train**<br>The latest moment a trip can start and still make every train, with a reminder. Shown only where the operator publishes first and last trains for every ride. | 🔍 **Honest about what it knows**<br>A missing timetable, station layout, transfer path or door position is shown as unavailable, never guessed. |
+| 📱 **Made for every screen**<br>iPhone, iPad and iPhone Duo, in English, 简体中文 and 繁體中文. | 🔄 **Always current**<br>Metro networks update from this repository's `main` branch, through mirrors that work in mainland China. |
 
-The other 44 catalog cities are source-pending for station data. Bundled metro topology powers
-rail routing independently of optional city-pack details.
+<p align="center">
+  <img src="http://just-go.com.cn/assets/screenshots/ipad.png" height="360" alt="Just-Go on iPad">
+  &nbsp;
+  <img src="http://just-go.com.cn/assets/screenshots/duo.png" height="360" alt="Just-Go on the iPhone Duo cover display">
+</p>
+
+## Cities
+
+**53 cities with an offline metro network, more than 7,500 stations:** Shanghai, Beijing,
+Guangzhou, Chengdu, Shenzhen, Wuhan, Chongqing, Nanjing, Hangzhou, Xi'an, Hong Kong, Tianjin,
+Suzhou, Zhengzhou, Hefei, Qingdao, Ningbo, Shenyang, Foshan, Changsha, Taipei, Changchun, Jinan,
+Dongguan, Nanchang, Fuzhou, Kunming, Dalian, Nanning, Xiamen, Guiyang, Wuxi, Kaohsiung, Harbin,
+Xuzhou, Shijiazhuang, Taiyuan, Hohhot, Nantong, Changzhou, Shaoxing, Wenzhou, Wuhu, Luoyang,
+Jinhua, Lanzhou, Xuchang, Urumqi, Taoyuan, Taichung, Macau, Taizhou and Chuzhou.
+
+Ziyang, Xiangtan, Xiangxi, Ezhou and Qingyuan are in the catalog with official links only. All 58
+cities share a directory of 776 reviewed official links to maps, travel information, accessibility
+resources and help pages.
+
+## What Just-Go won't pretend to know
+
+Just-Go does not do indoor navigation. It claims no 3D station maps, indoor routes, boarding cars,
+door positions or transfer corridors. On a transfer it shows the station and any official operator
+links, and tells you to follow the station signs. Exits and entrances appear where a city publishes
+them. Where an online routing provider measures the walk between platforms, it is shown as a
+distance, not as a path.
+
+## Privacy
+
+- **Your trips and saved places stay on your device.** There is no Just-Go account and no Just-Go
+  server.
+- **Location** is asked for only while the app is in use. A trip being guided keeps reading it in
+  the background, so the trip can correct itself and update the Lock Screen. The system shows its
+  location indicator while that lasts, and it stops when the trip ends.
+- **Place search** goes to Apple Maps.
+- **Planning a trip** sends its start and end points to Apple Maps for walking directions. In
+  builds with a Baidu Maps key, including TestFlight, they also go to Baidu Maps for the fare,
+  transfer distances, first and last trains and cycling routes, and place searches can go there
+  too. When you plan from where you are, the start point is your location.
+- **Station details** in Beijing, Shanghai, Guangzhou and Hangzhou are requested directly from the
+  operator (`www.bjsubway.com`, `m.shmetro.com`, `apis.gzmtr.com`, `www.hzmetro.com`) with the
+  station's ID, when you open them. The last good answer is kept on the device only, excluded from
+  backup, labelled as cached, and removed by Settings → Clear Cache.
+- **Hong Kong live trains** are requested from `rt.data.gov.hk` with station and line codes only.
+- **Data updates** check this repository through `cdn.jsdmirror.com`, `cdn.jsdelivr.net` and
+  `raw.githubusercontent.com`, at most every six hours. They never run on Low Data Mode or during a
+  trip, and can be turned off in Settings → Transit Data.
+- **Operator pages and documents** open only when you tap them, in viewers that keep nothing.
+- The app links to the [Privacy Policy](http://just-go.com.cn/privacy/) and
+  [Terms of Service](http://just-go.com.cn/terms/) on the Just-Go website.
+
+## For developers
+
+<details>
+<summary><strong>Build from source</strong></summary>
+
+1. Clone the repository.
+2. Open `Just-Go.xcodeproj` in Xcode 26 or newer. The app calls the iOS 26 SDK's glass effect
+   behind a runtime check, so it still runs on iOS 18 but needs that SDK to compile.
+3. Build the `Just-Go` scheme.
+
+Baidu Maps enrichment is optional. Put `BAIDU_MAPS_SECRET_AK` and `BAIDU_MAPS_SECRET_SK` in the
+git-ignored `Just-Go/Config/Secrets.xcconfig`; without them the app plans every route offline and
+shows no fare.
+
+There are no Xcode test targets. The gate is the Ruby and shell suites under `Scripts/`, the
+validators, and Debug and Release builds; `.github/workflows/ci.yml` runs all of them.
+
+</details>
+
+<details>
+<summary><strong>Data updates</strong></summary>
 
 The app keeps its metro networks and city packs in step with this repository's `main` branch
 (Settings → Transit Data → Updates): on request, or automatically at most every six hours, never on
 a Low Data Mode network and never during a trip. `DataPacks/manifest.json` lists each network and
-pack with its size and SHA-256; a city's two files are downloaded only when their hash differs from
+pack with its size and SHA-256. A city's two files are downloaded only when their hash differs from
 what is in use, checked against each other, and installed together or not at all. Downloads are
 dropped when the app itself updates.
 
-## Official Resource Directory
-
-The link catalog is independent of city packs: 43 cities have at least one verified official
-resource and 15 carry an explicit dated no-resource review. Its 770 links comprise 275 map links,
-447 travel links, 6 accessibility links, and 42 help links. Links do not count as bundled maps,
-offline content, or verified transfer guidance.
-
-Every one of Beijing's 444 canonical app stations has a reviewed station-information state.
-There are 418 exact pages: 416 current Beijing Subway directory bindings, the operator's retained
-legacy page for the temporarily closed Bajiao Amusement Park station, and the official 12306
-Beijing North station guide. Of the remaining stations, 18 have route- or operator-specific
-official context, 3 are not open for passenger service, and 5 are not current passenger stops.
-Seven newer stations in the official directory are not silently attached to stale OSM IDs because
-they do not yet have canonical entries in the bundled network snapshot.
-
-Hong Kong contributes 1 system map, 98 distinct Location Maps, 98 distinct Station Layouts, and
-14 distinct Light Rail Street Maps from the official MTR indexes, plus current rider-service
-pages. Macau remains source-pending for structured data but links to its official route, fare,
-and customer-service pages.
-
-Station Detail presents exactly three compact information categories. For 416 reviewed Beijing
-Subway station IDs, it requests first/last trains, exits, nearby text, and facilities directly from
-the operator when the detail page opens, validates the returned station identity, and renders the
-text as native rows. The response uses an ephemeral session, a 1 MB cap, a five-minute memory cache,
-and is never written to disk or copied into a city pack. The exact official station page remains an
-in-app source and fallback. This endpoint is not a published public API and no compatible content
-reuse license was found, so production distribution still requires operator or legal review.
-
-Hong Kong uses the same three-category structure for all 162 stations, with Live Trains replacing
-Beijing's First / Last label. Live train rows come from the official government transport API;
-exits and facilities use the included DATA.GOV.HK barrier-free snapshot where available, including
-verified unavailable states. Other reviewed pages, PDFs, and images open inside Just-Go only after a
-rider taps them: pages use a non-persistent WebKit session, while documents use memory-only native
-viewers with a 50 MB limit. Just-Go does not persist or redistribute operator content. Unsupported
-non-station resources retain an explicit browser fallback.
-
-## Indoor Guidance
-
-Just-Go does not do indoor navigation. The indoor graph, step planner, checkpoint scanner and
-their Live Go integration were removed rather than kept dormant: no verified source ever
-materialised, so every entry point was unreachable and the camera permission promised a scanner
-no rider could open. Just-Go claims no 3D maps, indoor routes, boarding cars, door positions, or
-transfer corridors. On a transfer, Live Go shows the station, any official operator links, and
-tells the rider to follow station signs.
-
-What it does show comes from official open data: exits and entrances where a city publishes them.
-Corridor lengths between platforms come from an online routing provider when one is configured,
-and are shown as a distance rather than a path.
-
-## Setup
-
-1. Clone the repository.
-2. Open `Just-Go.xcodeproj` in Xcode.
-3. Build the `Just-Go` scheme.
-
-Data updates come from the three origins in `Just-Go/Config/*.xcconfig`, tried in order: the
-mainland jsDelivr mirror, jsDelivr, and `raw.githubusercontent.com`, each serving this repository's
-`main` branch. `Scripts/validate_runtime_data_policy.rb` pins them by value. Wikimedia is never an
-origin.
+They come from the three origins in `Just-Go/Config/*.xcconfig`, tried in order: the mainland
+jsDelivr mirror, jsDelivr, and `raw.githubusercontent.com`, each serving `main`.
+`Scripts/validate_runtime_data_policy.rb` pins them by value. Wikimedia is never an origin.
 
 Regenerate and validate data from the vendored, reviewed inputs:
 
@@ -142,39 +129,83 @@ ruby Scripts/validate_official_transit_resources.rb
 ruby Scripts/validate_universal_city_data.rb
 ```
 
-Developers consuming Just-Go's data can use the Universal City Data Format.
-[`DataPacks/universal/`](DataPacks/universal/) publishes all 58 cities in one versioned,
-integrity-indexed JSON schema documented in
-[DataPacks/UNIVERSAL_FORMAT.md](DataPacks/UNIVERSAL_FORMAT.md).
+</details>
 
-See [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md), and
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for schema, provenance, checksums, and exact
-license treatment.
+<details>
+<summary><strong>Accessibility coverage by city</strong></summary>
 
-## Privacy And Network Use
+From each city's own open data. The counts are pinned in `Scripts/lib/oss_data_validators.rb`.
 
-- Personal station media stays in Application Support, is excluded from backup, and is never
-  used to infer routing, accessibility, indoor paths, or doors.
-- External operator resources render inside non-persistent in-app page and document viewers only
-  after a user action. Just-Go does not prefetch, persist, redistribute, or count them as offline
-  content. The operator receives the request; unsupported downloads remain an explicit browser
-  fallback controlled by the rider.
-- Opening one of the 416 natively supported Beijing station details sends its reviewed opaque
-  station ID to `www.bjsubway.com`. Just-Go displays selected response text, does not send it to a
-  Just-Go server, and keeps only a device-local, backup-excluded copy of the last good snapshot for
-  offline access, served clearly labeled as cached and deletable via Settings → Clear Cache.
-  Opening the exact source page may also contact provider-selected third-party web services.
-- Hong Kong live-arrival requests contact `rt.data.gov.hk` with official station and line
-  identifiers. They do not include personal media or the rider's location.
-- Location is read on the device and sent nowhere. It is asked for only while the app is in use.
-  A trip being guided keeps reading it with the app in the background, so the trip can correct
-  itself and move its Lock Screen activity on with the phone locked; the system shows its location
-  indicator for as long as that lasts, and it stops when the trip ends.
-- The app links to the published [Privacy Policy](https://e-rail.github.io/just-go/docs/privacy/)
-  and [Terms of Service](https://e-rail.github.io/just-go/docs/terms/).
+| City | Network stations | With accessibility data |
+| --- | ---: | ---: |
+| Xi'an | 263 | 167 |
+| Taipei | 152 | 119 |
+| Hong Kong | 243 | 98 |
+| Shanghai | 471 | 57 |
+| Beijing | 452 | 43 |
+| Guangzhou | 434 | 41 |
+| Shenzhen | 380 | 29 |
+| Nanjing | 281 | 11 |
+| Hangzhou | 270 | 11 |
+| Chengdu | 403 | 10 |
+| Wuhan | 359 | 7 |
+| Tianjin | 240 | 5 |
+| Chongqing | 300 | 3 |
+| Suzhou | 235 | 2 |
+
+The other cities are source-pending for station data. The bundled metro network powers rail
+routing on its own, without any city pack.
+
+</details>
+
+<details>
+<summary><strong>Station information and official resources</strong></summary>
+
+Station Detail presents three compact categories. When the page opens, it requests them from the
+operator: first and last trains, exits and facilities in Beijing (422 stations) and Shanghai (415),
+and first and last trains in Guangzhou (428) and Hangzhou (259). It validates the returned station
+identity and renders the text as native rows, using an ephemeral session, a 1 MB cap and a
+five-minute memory cache. None of these endpoints is a published public
+API, and no compatible content-reuse licence was found, so their content is fetched on the rider's
+device, never redistributed, and production distribution still requires operator or legal review.
+The exact official station page remains an in-app source and fallback. The contract the app
+follows is published in [StationInfoAPI/](StationInfoAPI/README.md).
+
+Hong Kong uses the same three categories for all 162 stations, with live trains from the official
+government transport API in place of first and last trains. Exits and facilities come from the
+bundled DATA.GOV.HK barrier-free snapshot, including verified unavailable states. Hong Kong also
+contributes 1 system map, 98 location maps, 98 station layouts and 14 Light Rail street maps from
+the official MTR indexes.
+
+All 450 of Beijing's canonical stations have a reviewed station-information state: 424 exact
+pages, 18 with route- or operator-specific official context, 3 not open for passenger service and
+5 not current passenger stops.
+
+The official resource directory is independent of the city packs. 43 cities have at least one
+verified official resource, and 15 carry an explicit dated no-resource review. Links do not count
+as bundled maps, offline content or verified transfer guidance. Reviewed pages, PDFs and images
+open inside Just-Go only after a tap: pages in a non-persistent WebKit session, documents in
+memory-only viewers with a 50 MB limit.
+
+</details>
+
+<details>
+<summary><strong>Data formats, sources and licences</strong></summary>
+
+- The [Universal City Data Format](DataPacks/UNIVERSAL_FORMAT.md):
+  [`DataPacks/universal/`](DataPacks/universal/) publishes all 58 cities in one versioned,
+  integrity-indexed JSON schema.
+- Metro networks come from OpenStreetMap under ODbL 1.0, separately attributed. Hong Kong data is
+  from DATA.GOV.HK under its reuse terms, and Taipei's from data.taipei under the OGDL-TW.
+  Beijing, Shanghai, Guangzhou and Hangzhou operator content is link-only and never committed.
+- [DataPacks/README.md](DataPacks/README.md), [DataPacks/RIGHTS.md](DataPacks/RIGHTS.md) and
+  [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) record schema, provenance, checksums and the
+  exact licence treatment.
+
+</details>
 
 ## License
 
-Just-Go's original software source is GPL-3.0 licensed. Third-party data and media are not granted
-under the GPL-3.0 license; their terms are recorded in `DataPacks/rights_inventory.json` and
-`THIRD_PARTY_NOTICES.md`.
+Just-Go's original software source is licensed under GPL-3.0. Third-party data and media are not
+granted under the GPL-3.0 licence; their terms are recorded in `DataPacks/rights_inventory.json`
+and `THIRD_PARTY_NOTICES.md`.

@@ -266,6 +266,32 @@ struct MetroNetwork: Codable, Equatable, Identifiable {
     }
 }
 
+extension MetroNetwork {
+    /// Every interchange the map draws off its own point, placed where its lines meet
+    /// (`InterchangePlacement`), by qualified station ID. Placed against all of the station's lines;
+    /// the map places a trip's two lines at a larger interchange itself.
+    func interchangeSymbolCoordinates() -> [String: CLLocationCoordinate2D] {
+        let linesByID = Dictionary(lines.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        var tracksByLineID: [String: [[CLLocationCoordinate2D]]] = [:]
+        func tracks(of lineID: String) -> [[CLLocationCoordinate2D]]? {
+            if let known = tracksByLineID[lineID] { return known }
+            guard let line = linesByID[lineID] else { return nil }
+            let tracks = line.paths.map { $0.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) } }
+            tracksByLineID[lineID] = tracks
+            return tracks
+        }
+        var placed: [String: CLLocationCoordinate2D] = [:]
+        for station in stations {
+            let lineIDs = Set(station.lineIDs).sorted()
+            guard lineIDs.count > 1 else { continue }
+            let placement = InterchangePlacement.place(station: station.coordinate, lineTracks: lineIDs.compactMap(tracks(of:)))
+            guard placement.kind == .crossing || placement.kind == .sideBySide else { continue }
+            placed[MetroStationIdentifier.qualified(cityID: cityID, stationID: station.id)] = placement.coordinate
+        }
+        return placed
+    }
+}
+
 private final class NormalizedStationIndexBox {
     let value: [String: [MetroStation]]
     init(_ value: [String: [MetroStation]]) { self.value = value }
@@ -277,12 +303,19 @@ protocol MetroNetworkProviding: Sendable {
     func stations(in cityID: String) async -> [Station]
     /// Every bundled station, everywhere. Search ranks these by distance from the rider.
     func allStations() async -> [Station]
+    /// Where the map draws a city's interchanges that it does not draw on their own point, by
+    /// qualified station ID (`MetroNetwork.interchangeSymbolCoordinates()`).
+    func interchangeSymbolCoordinates(in cityID: String) async -> [String: CLLocationCoordinate2D]
     /// Forget what is loaded for these cities (every city for nil), because a data update changed
     /// the file underneath. The next read loads the network now in use.
     func invalidate(cityIDs: Set<String>?) async
 }
 
 extension MetroNetworkProviding {
+    func interchangeSymbolCoordinates(in cityID: String) async -> [String: CLLocationCoordinate2D] {
+        [:]
+    }
+
     func stations(in cityID: String) async -> [Station] {
         await network(for: cityID)?.displayStations ?? []
     }
@@ -316,6 +349,8 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
     /// the cache together (at launch: the map, the station index and quick-tag repair) would each
     /// parse the same files.
     private var inFlightNetworks: [String: Task<MetroNetwork?, Never>] = [:]
+    /// `interchangeSymbolCoordinates(in:)`, by city, worked out once per loaded network.
+    private var interchangeSymbols: [String: [String: CLLocationCoordinate2D]] = [:]
 
     func network(for cityID: String) async -> MetroNetwork? {
         if let network = networks[cityID] {
@@ -479,6 +514,22 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
         return [InstalledCityNetworks.fileURL(for: cityID), bundled].compactMap { $0 }
     }
 
+    /// Placed off the actor and off the main thread: a view with Shenzhen and Hong Kong in it holds
+    /// over 200 interchanges, which measured 97 ms on the main thread of a Debug simulator build.
+    func interchangeSymbolCoordinates(in cityID: String) async -> [String: CLLocationCoordinate2D] {
+        if let known = interchangeSymbols[cityID] { return known }
+        guard let network = await network(for: cityID) else { return [:] }
+        let placed = await Task.detached(priority: .utility) {
+            network.interchangeSymbolCoordinates()
+        }.value
+        // A data update may have replaced the network meanwhile; keep only what matches the one
+        // now loaded.
+        if networks[cityID]?.version == network.version {
+            interchangeSymbols[cityID] = placed
+        }
+        return placed
+    }
+
     func invalidate(cityIDs: Set<String>?) {
         let affected = cityIDs ?? Set(Self.supportedCityIDs)
         for cityID in affected {
@@ -487,6 +538,7 @@ actor BundledMetroNetworkService: MetroNetworkProviding {
             summaries[cityID] = nil
             missingCityIDs.remove(cityID)
             inFlightNetworks[cityID] = nil
+            interchangeSymbols[cityID] = nil
         }
         allStationsCache = nil
         MetroNetwork.clearNormalizedIndexCache()
